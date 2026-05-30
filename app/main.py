@@ -1,33 +1,49 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
+import models, schemas
+from database import engine, get_db
+
+# Create tables automatically
+models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI()
 
 
-# Task 1 — Returning my name and college name
-@app.get("/")
-def home():
-    return {
-        "name": "Suryansh Pratap Singh",
-        "college": "Jaypee University of Engineering and Technology",
-        "message": "FastApi Learning"}
+# CREATE a product
+@app.post("/products", response_model=schemas.ProductResponse)
+def create_product(product: schemas.ProductCreate, db: Session = Depends(get_db)):
+    new_product = models.Product(**product.dict())
+    db.add(new_product)
+    db.commit()
+    db.refresh(new_product)
+    return new_product
 
-# Task 2 — Product by ID (Path Parameter)
-@app.get("/product/{product_id}")
-def get_product(product_id: int):
-    return {
-        "product_id": product_id,
-        "name": "Sample Product",
-        "price": 999,
-        "in_stock": True}
 
-# Task 3 — Create Product (POST Request)
-class Product(BaseModel):
-    name: str
-    price: float
 
-@app.post("/create-product")
-def create_product(product: Product):
-    return {
-        "message": "Product created successfully!",
-        "product_name": product.name,
-        "product_price": product.price }
+# GET all products
+@app.get("/products")
+def get_products(db: Session = Depends(get_db)):
+    products = db.query(models.Product).all()
+    return products
+
+
+
+# GET single product by ID
+@app.get("/products/{product_id}", response_model=schemas.ProductResponse)
+def get_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return product
+
+
+
+# DELETE a product
+@app.delete("/products/{product_id}")
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    db.delete(product)
+    db.commit()
+    return {"message": "Product deleted successfully"}
