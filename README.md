@@ -38,6 +38,17 @@ All product routes are now protected — you must login first to access them.
 - Register and Login endpoints
 - Dependency injection in FastAPI
 
+### Day 4 — Environment Variables & Security
+Removed all hardcoded passwords and secret keys from the code.
+Sensitive values now live in a .env file that never gets pushed to GitHub.
+
+**What I learned:**
+- Why hardcoded secrets are dangerous
+- Creating and using .env files
+- Reading env variables in Python with python-dotenv and os.getenv()
+- Using .env.example as a safe template for other developers
+- Keeping secrets out of GitHub with .gitignore
+
 ---
 
 ## How to Run
