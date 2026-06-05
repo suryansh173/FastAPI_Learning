@@ -27,6 +27,17 @@ No more fake/hardcoded data — everything now saves and loads from DB.
 - Full CRUD — Create, Read, Delete products
 - How database sessions work per request
 
+### Day 3 — Authentication with JWT
+Added real login and signup. Passwords are hashed before saving to database.
+All product routes are now protected — you must login first to access them.
+
+**What I learned:**
+- Password hashing with Bcrypt
+- Creating and verifying JWT tokens
+- Protecting routes with HTTPBearer
+- Register and Login endpoints
+- Dependency injection in FastAPI
+
 ---
 
 ## How to Run
